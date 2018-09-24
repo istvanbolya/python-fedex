@@ -231,3 +231,49 @@ class FedexOpenShipmentRequest(FedexBaseService):
         package_weight = package_item.Weight.Value
         self.RequestedShipment.TotalWeight.Value += package_weight
         self.RequestedShipment.PackageCount += 1
+
+
+class FedexDeleteOpenShipmentRequest(FedexBaseService):
+    """
+    This class allows you to delete an open shipment, given an index number.
+    """
+
+    def __init__(self, config_obj, *args, **kwargs):
+        """
+        Deletes an openshipment via an index number.
+        """
+
+        self._config_obj = config_obj
+
+        # Holds version info for the VersionId SOAP object.
+        self._version_info = {'service_id': 'ship', 'major': '15',
+                              'intermediate': '0', 'minor': '0'}
+        self.Index = None
+        """@ivar: Holds the Index WSDL object."""
+        # Call the parent FedexBaseService class for basic setup work.
+        super(FedexDeleteOpenShipmentRequest, self).__init__(self._config_obj,
+                                                             'OpenshipService_v15.wsdl',
+                                                             *args, **kwargs)
+
+    def _prepare_wsdl_objects(self):
+        """
+        Preps the WSDL data structures for the user.
+        """
+        pass
+
+    def _assemble_and_send_request(self):
+        """
+        Fires off the Fedex request.
+
+        @warning: NEVER CALL THIS METHOD DIRECTLY. CALL send_request(), WHICH RESIDES
+            ON FedexBaseService AND IS INHERITED.
+        """
+
+        client = self.client
+        # Fire off the query.
+        return client.service.deleteOpenShipment(
+            WebAuthenticationDetail=self.WebAuthenticationDetail,
+            ClientDetail=self.ClientDetail,
+            TransactionDetail=self.TransactionDetail,
+            Version=self.VersionId,
+            Index=self.Index)
